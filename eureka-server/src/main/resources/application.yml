@@ -1,0 +1,21 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: eureka-server
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    # This is the server itself — do NOT register with itself or fetch its own registry
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    # Wait time before evicting unreachable services (in ms)
+    eviction-interval-timer-in-ms: 5000
+    # Disable self-preservation in dev mode (re-enable in production)
+    enable-self-preservation: false

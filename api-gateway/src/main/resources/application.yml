@@ -1,0 +1,125 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # ── USER-SERVICE ──────────────────────────────────────
+        - id: user-register
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1.0/blogsite/user/register
+        - id: user-login
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1.0/blogsite/user/login
+        - id: user-update-profile
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1.0/blogsite/user/profile/**
+        - id: user-delete
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1.0/blogsite/user/delete/**
+
+        # ── BLOG-SERVICE (BlogPost + Category + Tag + Like) ───
+        - id: blog-add
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/add
+        - id: blog-edit
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/edit/**
+        - id: blog-delete
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/delete/**
+        - id: blog-getall-user
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/user/**
+        - id: blog-like
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/like/**
+        - id: blog-unlike
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/posts/unlike/**
+        - id: category-all
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/categories/**
+        - id: tag-all
+          uri: lb://blog-service
+          predicates:
+            - Path=/api/v1.0/blogsite/tags/**
+
+        # ── COMMENT-SERVICE ───────────────────────────────────
+        - id: comment-add
+          uri: lb://comment-service
+          predicates:
+            - Path=/api/v1.0/blogsite/comments/add/**
+        - id: comment-edit
+          uri: lb://comment-service
+          predicates:
+            - Path=/api/v1.0/blogsite/comments/edit/**
+        - id: comment-delete
+          uri: lb://comment-service
+          predicates:
+            - Path=/api/v1.0/blogsite/comments/delete/**
+        - id: comment-post
+          uri: lb://comment-service
+          predicates:
+            - Path=/api/v1.0/blogsite/comments/post/**
+
+        # ── SEARCH-SERVICE ────────────────────────────────────
+        - id: search-by-category
+          uri: lb://search-service
+          predicates:
+            - Path=/api/v1.0/blogsite/search/category/**
+        - id: search-by-tag
+          uri: lb://search-service
+          predicates:
+            - Path=/api/v1.0/blogsite/search/tag/**
+        - id: search-by-duration
+          uri: lb://search-service
+          predicates:
+            - Path=/api/v1.0/blogsite/search/duration/**
+        - id: search-post-detail
+          uri: lb://search-service
+          predicates:
+            - Path=/api/v1.0/blogsite/search/post/**
+
+        # ── NOTIFICATION-SERVICE ──────────────────────────────
+        - id: notification-get
+          uri: lb://notification-service
+          predicates:
+            - Path=/api/v1.0/blogsite/notifications/**
+
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:4200"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true

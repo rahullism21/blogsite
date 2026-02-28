@@ -1,0 +1,44 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: search-service
+
+  datasource:
+    # search-service reads from blogs_db (read replica concept — shares blog data).
+    # In production, you'd use a dedicated read replica or event-sourced read model.
+    # For this implementation, both blog-service and search-service point to blogs_db.
+    url: jdbc:mysql://localhost:3306/blogs_db?createDatabaseIfNotExist=true
+    username: root
+    password: yourpassword
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate   # READ-ONLY mode: validate schema, never modify it
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+
+feign:
+  client:
+    config:
+      user-service:
+        connectTimeout: 5000
+        readTimeout: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
